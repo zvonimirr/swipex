@@ -14,8 +14,10 @@ defmodule Swipex.Application do
       {Phoenix.PubSub, name: Swipex.PubSub},
       # Start the Endpoint (http/https)
       SwipexWeb.Endpoint,
-      # Start the Bolt Sips link,
-      {Bolt.Sips, Application.get_env(:bolt_sips, Bolt)}
+      # Start the Bolt Sips link
+      {Bolt.Sips, Application.get_env(:bolt_sips, Bolt)},
+      # Start the Presence tracker
+      SwipexWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
