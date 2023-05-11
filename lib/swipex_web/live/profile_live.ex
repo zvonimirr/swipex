@@ -1,6 +1,12 @@
 defmodule SwipexWeb.ProfileLive do
   use SwipexWeb, :live_view
+  alias Phoenix.PubSub
   alias SwipexWeb.ProfileLive.EditForm
+
+  def mount(_params, _session, socket) do
+    PubSub.subscribe(Swipex.PubSub, "swipex")
+    {:ok, socket}
+  end
 
   def handle_event("import", %{"id" => id}, socket) do
     id = String.to_integer(id)
@@ -13,6 +19,7 @@ defmodule SwipexWeb.ProfileLive do
         if user == %{} do
           {:noreply, put_flash(socket, :error, "Invalid user ID.")}
         else
+          PubSub.broadcast(Swipex.PubSub, "swipex", {:user_changed, user})
           {:noreply, assign(socket, :user, user) |> put_flash(:info, "User imported!")}
         end
 
@@ -48,6 +55,8 @@ defmodule SwipexWeb.ProfileLive do
       Bolt.Sips.query!(conn, "MATCH (u:User {id: $id}) RETURN u", %{id: socket.assigns.user.id})
       |> get_user_from_response()
 
+    PubSub.broadcast(Swipex.PubSub, "swipex", {:new_user, user})
+
     {:noreply, assign(socket, :user, user) |> put_flash(:info, "User updated!")}
   end
 
@@ -67,6 +76,30 @@ defmodule SwipexWeb.ProfileLive do
         id2: String.to_integer(potential_match_id)
       }
     )
+
+    # Check if the other user has liked the current user.
+    match =
+      Bolt.Sips.query!(
+        conn,
+        """
+        MATCH (u1:User {id: $id1})
+        MATCH (u2:User {id: $id2})
+        MATCH (u1)-[r:LIKES]->(u2)
+        RETURN u1, u2
+        """,
+        %{
+          id1: String.to_integer(potential_match_id),
+          id2: socket.assigns.user.id
+        }
+      )
+
+    unless match.results == [] do
+      [u1] = Bolt.Sips.Response.fetch!(match, "u1")
+      [u2] = Bolt.Sips.Response.fetch!(match, "u2")
+
+      PubSub.broadcast(Swipex.PubSub, "swipex", {:match, u1.properties["id"]})
+      PubSub.broadcast(Swipex.PubSub, "swipex", {:match, u2.properties["id"]})
+    end
 
     {:noreply, assign(socket, :potential_match, potential_match_id)}
   end
@@ -89,6 +122,27 @@ defmodule SwipexWeb.ProfileLive do
     )
 
     {:noreply, assign(socket, :potential_match, potential_match_id)}
+  end
+
+  def handle_info({:new_user, user}, socket) do
+    # Force re-rendering of the page
+    {:noreply, put_flash(socket, :info, "#{user.name} has arrived!")}
+  end
+
+  def handle_info({:match, uid}, socket) do
+    if socket.assigns.user.id == uid do
+      {:noreply, put_flash(socket, :info, "You have a new match!")}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_info({:user_changed, user}, socket) do
+    if socket.assigns.user.id == user.id do
+      {:noreply, put_flash(socket, :info, "Welcome back #{user.name}!")}
+    else
+      {:noreply, socket}
+    end
   end
 
   def render(assigns) do
