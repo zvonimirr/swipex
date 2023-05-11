@@ -51,8 +51,7 @@ config :phoenix, :json_library, Jason
 config :bolt_sips, Bolt,
   url: "bolt://localhost:7687",
   basic_auth: [username: "neo4j", password: "swipex-dev"],
-  pool_size: 10,
-  max_overflow: 2
+  pool_size: 10
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -17,7 +17,9 @@ defmodule SwipexWeb.Router do
   scope "/", SwipexWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live_session :default, on_mount: [{SwipexWeb.Profile, :current_user}] do
+      live "/", ProfileLive, :index
+    end
   end
 
   # Other scopes may use custom stacks.

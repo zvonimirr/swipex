@@ -3,7 +3,7 @@ version: '3.8'
 services:
   neo4j:
     container_name: swipex_neo4j
-    image: neo4j:5.7
+    image: neo4j/neo4j-arm64-experimental:3.5.32-arm64
     environment:
       NEO4J_AUTH: 'neo4j/swipex-dev'
     ports:
