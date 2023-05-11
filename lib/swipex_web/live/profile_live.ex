@@ -68,7 +68,7 @@ defmodule SwipexWeb.ProfileLive do
       }
     )
 
-    {:noreply, assign(socket, :potential_match, nil)}
+    {:noreply, assign(socket, :potential_match, potential_match_id)}
   end
 
   def handle_event("dislike", %{"potential-match" => potential_match_id}, socket) do
@@ -88,7 +88,7 @@ defmodule SwipexWeb.ProfileLive do
       }
     )
 
-    {:noreply, assign(socket, :potential_match, nil)}
+    {:noreply, assign(socket, :potential_match, potential_match_id)}
   end
 
   def render(assigns) do
