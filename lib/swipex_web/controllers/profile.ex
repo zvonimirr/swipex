@@ -1,7 +1,5 @@
 defmodule SwipexWeb.Profile do
   use SwipexWeb, :verified_routes
-  import Plug.Conn
-  import Phoenix.Controller
 
   def on_mount(:current_user, _params, session, socket) do
     # Generate user info if not present in the session
