@@ -13,9 +13,9 @@ defmodule Swipex.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Swipex.PubSub},
       # Start the Endpoint (http/https)
-      SwipexWeb.Endpoint
-      # Start a worker by calling: Swipex.Worker.start_link(arg)
-      # {Swipex.Worker, arg}
+      SwipexWeb.Endpoint,
+      # Start the Bolt Sips link,
+      {Bolt.Sips, Application.get_env(:bolt_sips, Bolt)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
