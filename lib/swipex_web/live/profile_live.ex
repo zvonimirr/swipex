@@ -143,13 +143,19 @@ defmodule SwipexWeb.ProfileLive do
           </div>
         </div>
       <% else %>
-        <p class="text-2xl">No more potential matches!</p>
+        <div class="flex flex-col">
+          <p class="text-2xl">No more potential matches!</p>
+          <p>(Note: You must save your profile before you can start swiping)</p>
+        </div>
       <% end %>
     </div>
     <hr />
     <div class="mt-3 flex flex-col gap-4">
       <h1 class="text-5xl">Your matches</h1>
       <div class="flex gap-3">
+        <%= if @matches == [] do %>
+          <p>No matches yet!</p>
+        <% end %>
         <%= for match <- @matches do %>
           <div class="flex flex-col gap-3">
             <img src={match.avatar} class="w-32 h-32 rounded-full" />
