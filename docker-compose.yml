@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   neo4j:
     container_name: swipex_neo4j
