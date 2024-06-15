@@ -25,4 +25,18 @@ defmodule SwipexWeb.PageHTML do
     </div>
     """
   end
+
+  def login(assigns) do
+    ~H"""
+    <div class="max-w-md mx-auto">
+      <p>Login to Swipex</p>
+      <form action="/login" method="post" class="flex flex-col gap-4">
+        <input type="text" name="name" placeholder="Name" />
+        <input type="password" name="password" placeholder="Password" />
+        <%= csrf_input_tag("/login") %>
+        <input type="submit" value="Login" />
+      </form>
+    </div>
+    """
+  end
 end

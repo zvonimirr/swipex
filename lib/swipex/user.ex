@@ -9,4 +9,18 @@ defmodule Swipex.User do
       password: password
     })
   end
+
+  def login(name, password) do
+    conn = Bolt.Sips.conn()
+
+    with {:ok, %Bolt.Sips.Response{results: [%{"u" => %{properties: user}}]}} <-
+           Bolt.Sips.query(conn, "MATCH (u:User {name: $name, password: $password}) RETURN u", %{
+             name: name,
+             password: password
+           }) do
+      {:ok, user}
+    else
+      _ -> {:error, "Invalid name or password."}
+    end
+  end
 end
