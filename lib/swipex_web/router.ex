@@ -4,6 +4,7 @@ defmodule SwipexWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
+    plug Plug.CSRFProtection
     plug :fetch_live_flash
     plug :put_root_layout, {SwipexWeb.Layouts, :root}
     plug :protect_from_forgery
@@ -17,9 +18,13 @@ defmodule SwipexWeb.Router do
   scope "/", SwipexWeb do
     pipe_through :browser
 
-    live_session :default, on_mount: [{SwipexWeb.Profile, :current_user}] do
-      live "/", ProfileLive, :index
-    end
+    get "/", PageController, :index
+    get "/register", PageController, :register
+    post "/register", PageController, :do_register
+
+    # live_session :default, on_mount: [{SwipexWeb.Profile, :current_user}] do
+    #   live "/", ProfileLive, :index
+    # end
   end
 
   # Other scopes may use custom stacks.
