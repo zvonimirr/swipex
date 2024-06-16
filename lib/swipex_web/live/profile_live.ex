@@ -60,6 +60,11 @@ defmodule SwipexWeb.ProfileLive do
     ~H"""
     <div class="flex gap-4 justify-between w-full mb-3">
       <div class="flex flex-col gap-3">
+        <img
+          src={"https://api.dicebear.com/9.x/lorelei/svg?seed=#{@user["id"]}"}
+          alt="Profile picture"
+          class="rounded-full"
+        />
         <h1 class="text-4xl"><%= @user["name"] %></h1>
         <p>Hey there, <%= @user["name"] %>, this is your profile page.</p>
         <hr />
@@ -68,6 +73,11 @@ defmodule SwipexWeb.ProfileLive do
         <div class="flex flex-col gap-3">
           <p class="text-2xl">Let's swipe!</p>
           <div class="flex flex-col gap-3">
+            <img
+              src={"https://api.dicebear.com/9.x/lorelei/svg?seed=#{@potential_match["id"]}"}
+              alt="Profile picture"
+              class="rounded-full"
+            />
             <p><%= @potential_match["name"] %></p>
             <div class="flex gap-3">
               <button
@@ -101,6 +111,11 @@ defmodule SwipexWeb.ProfileLive do
         <% end %>
         <%= for match <- @matches do %>
           <div class="flex flex-col gap-3">
+            <img
+              src={"https://api.dicebear.com/9.x/lorelei/svg?seed=#{match["id"]}"}
+              alt="Profile picture"
+              class="rounded-full"
+            />
             <a href={"/chat/#{match["id"]}"} class="text-blue-400 hover:underline">
               <%= match["name"] %>
             </a>

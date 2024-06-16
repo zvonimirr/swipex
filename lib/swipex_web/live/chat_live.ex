@@ -3,8 +3,6 @@ defmodule SwipexWeb.ChatLive do
   alias Phoenix.PubSub
 
   def mount(%{"id" => id}, %{"user_id" => user_id}, socket) do
-    IO.inspect({id, user_id})
-
     with true <- Swipex.User.has_matched(id, user_id),
          {:ok, user} <- Swipex.User.get_user_by_id(id) do
       PubSub.subscribe(Swipex.PubSub, "swipex")
@@ -55,7 +53,13 @@ defmodule SwipexWeb.ChatLive do
 
     ~H"""
     <a href="/profile" class="text-blue-500">Back to profile</a>
+    <img
+      src={"https://api.dicebear.com/9.x/lorelei/svg?seed=#{@recipient["id"]}"}
+      alt="Profile picture"
+      class="rounded-full w-24 h-24"
+    />
     <h1 class="text-4xl mb-2">Chat with <%= @recipient["name"] %></h1>
+
     <hr />
     <div class="flex flex-col mt-4">
       <%= for message <- @messages do %>
