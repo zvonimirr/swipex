@@ -3,15 +3,19 @@ defmodule SwipexWeb.ProfileLive do
   alias Phoenix.PubSub
 
   def mount(_params, %{"user_id" => _user_id}, socket) do
-    PubSub.subscribe(Swipex.PubSub, "swipex")
-    {:ok, socket}
+    if is_nil(socket.assigns.user) do
+      mount(nil, nil, socket)
+    else
+      PubSub.subscribe(Swipex.PubSub, "swipex")
+      {:ok, socket}
+    end
   end
 
   def mount(_params, _session, socket) do
     {:ok,
      socket
      |> put_flash(:error, "You must be logged in to access this page.")
-     |> redirect(to: "/login")}
+     |> redirect(to: "/logout")}
   end
 
   def handle_event("like", %{"potential-match" => match_id}, socket) do
