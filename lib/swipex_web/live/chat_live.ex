@@ -52,6 +52,7 @@ defmodule SwipexWeb.ChatLive do
       )
 
     ~H"""
+    <a href="/profile" class="text-blue-500">Back to profile</a>
     <h1 class="text-4xl mb-2">Chat with <%= @recipient["name"] %></h1>
     <hr />
     <div class="flex flex-col mt-4">
