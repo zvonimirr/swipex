@@ -3,9 +3,16 @@ defmodule SwipexWeb.ProfileLive do
   alias Phoenix.PubSub
   alias SwipexWeb.ProfileLive.EditForm
 
-  def mount(_params, _session, socket) do
-    PubSub.subscribe(Swipex.PubSub, "swipex")
-    {:ok, socket}
+  def mount(_params, session, socket) do
+    if Map.has_key?(session, "user_id") do
+      PubSub.subscribe(Swipex.PubSub, "swipex")
+      {:ok, socket}
+    else
+      {:ok,
+       socket
+       |> put_flash(:error, "You must be logged in to access this page.")
+       |> redirect(to: "/login")}
+    end
   end
 
   def handle_event("import", %{"id" => id}, socket) do
@@ -146,49 +153,33 @@ defmodule SwipexWeb.ProfileLive do
   end
 
   def render(assigns) do
-    assigns = assign(assigns, :potential_match, get_potential_match(assigns.user.id))
-    assigns = assign(assigns, :matches, get_matches(assigns.user.id))
+    assigns = assign(assigns, :potential_match, get_potential_match(assigns.user["id"]))
+    assigns = assign(assigns, :matches, get_matches(assigns.user["id"]))
 
     ~H"""
     <div class="flex gap-4 justify-between w-full mb-3">
       <div class="flex flex-col gap-3">
-        <h1 class="text-4xl"><%= @user.name %></h1>
-        <img src={@user.avatar} class="w-32 h-32 rounded-full" />
-        <p>Hey there, <%= @user.name %>, this is your profile page.</p>
-        <p>Why don't you tell us something about yourself?</p>
-
-        <div class="flex flex-col gap-3">
-          <.live_component id="edit_form" module={EditForm} user={@user} />
-        </div>
+        <h1 class="text-4xl"><%= @user["name"] %></h1>
+        <p>Hey there, <%= @user["name"] %>, this is your profile page.</p>
 
         <hr />
-
-        <div class="flex flex-col gap-3">
-          <p>Already have an account?</p>
-          <form phx-submit="import" class="flex flex-col gap-4">
-            <input type="number" name="id" placeholder="User ID" />
-            <button type="submit" class="bg-blue-300 text-white rounded-md p-3">Import</button>
-          </form>
-        </div>
       </div>
       <%= if @potential_match do %>
         <div class="flex flex-col gap-3">
           <p class="text-2xl">Let's swipe!</p>
           <div class="flex flex-col gap-3">
-            <img src={@potential_match.avatar} class="w-32 h-32 rounded-full" />
-            <p><%= @potential_match.name %></p>
-            <p><%= @potential_match.bio %></p>
+            <p><%= @potential_match["name"] %></p>
             <div class="flex gap-3">
               <button
                 phx-click="like"
-                phx-value-potential-match={@potential_match.id}
+                phx-value-potential-match={@potential_match["id"]}
                 class="bg-green-300 text-white rounded-md p-3"
               >
                 Like
               </button>
               <button
                 phx-click="dislike"
-                phx-value-potential-match={@potential_match.id}
+                phx-value-potential-match={@potential_match["id"]}
                 class="bg-red-300 text-white rounded-md p-3"
               >
                 Dislike
@@ -199,7 +190,6 @@ defmodule SwipexWeb.ProfileLive do
       <% else %>
         <div class="flex flex-col">
           <p class="text-2xl">No more potential matches!</p>
-          <p>(Note: You must save your profile before you can start swiping)</p>
         </div>
       <% end %>
     </div>
@@ -212,8 +202,7 @@ defmodule SwipexWeb.ProfileLive do
         <% end %>
         <%= for match <- @matches do %>
           <div class="flex flex-col gap-3">
-            <img src={match.avatar} class="w-32 h-32 rounded-full" />
-            <p class="text-center"><%= match.name %></p>
+            <p class="text-center"><%= match["name"] %></p>
           </div>
         <% end %>
       </div>

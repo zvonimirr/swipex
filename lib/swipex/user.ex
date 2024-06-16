@@ -23,4 +23,15 @@ defmodule Swipex.User do
       _ -> {:error, "Invalid name or password."}
     end
   end
+
+  def get_user_by_id(id) do
+    conn = Bolt.Sips.conn()
+
+    with {:ok, %Bolt.Sips.Response{results: [%{"u" => %{properties: user}}]}} <-
+           Bolt.Sips.query(conn, "MATCH (u:User {id: $id}) RETURN u", %{id: id}) do
+      {:ok, user}
+    else
+      _ -> {:error, "User not found."}
+    end
+  end
 end

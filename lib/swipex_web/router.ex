@@ -24,9 +24,9 @@ defmodule SwipexWeb.Router do
     get "/login", PageController, :login
     post "/login", PageController, :do_login
 
-    # live_session :default, on_mount: [{SwipexWeb.Profile, :current_user}] do
-    #   live "/", ProfileLive, :index
-    # end
+    live_session :default, on_mount: [{SwipexWeb.Profile, :current_user}] do
+      live "/profile", ProfileLive, :index
+    end
   end
 
   # Other scopes may use custom stacks.

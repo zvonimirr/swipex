@@ -2,11 +2,17 @@ defmodule SwipexWeb.PageController do
   use SwipexWeb, :controller
 
   def index(conn, _params) do
-    render(conn, :index)
+    case get_session(conn, :user_id) do
+      nil -> render(conn, :index)
+      _ -> redirect(conn, to: "/profile")
+    end
   end
 
   def register(conn, _params) do
-    render(conn, :register)
+    case get_session(conn, :user_id) do
+      nil -> render(conn, :register)
+      _ -> redirect(conn, to: "/profile")
+    end
   end
 
   def do_register(conn, %{
