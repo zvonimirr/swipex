@@ -26,6 +26,7 @@ defmodule SwipexWeb.Router do
 
     live_session :default, on_mount: [{SwipexWeb.Profile, :current_user}] do
       live "/profile", ProfileLive, :index
+      live "/chat/:id", ChatLive, :index
     end
   end
 

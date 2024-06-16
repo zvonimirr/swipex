@@ -1,18 +1,17 @@
 defmodule SwipexWeb.ProfileLive do
   use SwipexWeb, :live_view
   alias Phoenix.PubSub
-  alias SwipexWeb.ProfileLive.EditForm
 
-  def mount(_params, session, socket) do
-    if Map.has_key?(session, "user_id") do
-      PubSub.subscribe(Swipex.PubSub, "swipex")
-      {:ok, socket}
-    else
-      {:ok,
-       socket
-       |> put_flash(:error, "You must be logged in to access this page.")
-       |> redirect(to: "/login")}
-    end
+  def mount(_params, %{"user_id" => _user_id}, socket) do
+    PubSub.subscribe(Swipex.PubSub, "swipex")
+    {:ok, socket}
+  end
+
+  def mount(_params, _session, socket) do
+    {:ok,
+     socket
+     |> put_flash(:error, "You must be logged in to access this page.")
+     |> redirect(to: "/login")}
   end
 
   def handle_event("like", %{"potential-match" => match_id}, socket) do
@@ -63,7 +62,6 @@ defmodule SwipexWeb.ProfileLive do
       <div class="flex flex-col gap-3">
         <h1 class="text-4xl"><%= @user["name"] %></h1>
         <p>Hey there, <%= @user["name"] %>, this is your profile page.</p>
-
         <hr />
       </div>
       <%= if @potential_match do %>
@@ -95,7 +93,6 @@ defmodule SwipexWeb.ProfileLive do
         </div>
       <% end %>
     </div>
-    <hr />
     <div class="mt-3 flex flex-col gap-4">
       <h1 class="text-5xl">Your matches</h1>
       <div class="flex gap-3">
