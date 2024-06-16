@@ -14,3 +14,10 @@ Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
+## Work to be done
+- [x] Add user registration and authentication
+- [x] Basic like/dislike functionality
+- [x] Live chat with matches
+- [ ] Add tests
+- [ ] Hash passwords
+- [ ] Improve UI/UX
