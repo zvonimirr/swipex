@@ -3,7 +3,7 @@ A simple Tinder-like clone written in Phoenix LiveView and using Neo4j.
 
 **Note:** This project is still in development. It is not yet ready for production and is likely to have bugs and missing features.
 
-<img width="1728" alt="Screenshot 2023-05-11 at 05 08 14" src="https://github.com/zvonimirr/swipex/assets/18758022/d232c322-5190-4ce4-b3b3-06d6e50af0eb">
+![Swipex](./demo.png)
 
 ## Development
 Run `docker-compose up -d` to start the Neo4j database.
