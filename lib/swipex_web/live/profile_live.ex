@@ -43,6 +43,18 @@ defmodule SwipexWeb.ProfileLive do
     end
   end
 
+  def handle_event("delete", _, socket) do
+    case Swipex.User.delete_user_by_id(socket.assigns.user["id"]) do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> redirect(to: "/logout")}
+
+      {:error, _} ->
+        {:noreply, socket |> put_flash(:error, "Failed to delete account.")}
+    end
+  end
+
   def handle_info({:new_user, name}, socket) do
     {:noreply, put_flash(socket, :info, "#{name} has arrived!")}
   end
@@ -128,6 +140,7 @@ defmodule SwipexWeb.ProfileLive do
       </div>
       <hr />
       <a href="/logout" class="text-red-500">Logout</a>
+      <button phx-click="delete" class="bg-red-500 text-white">Delete account</button>
     </div>
     """
   end

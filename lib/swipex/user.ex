@@ -35,6 +35,19 @@ defmodule Swipex.User do
     end
   end
 
+  def delete_user_by_id(id) do
+    conn = Bolt.Sips.conn()
+
+    Bolt.Sips.query(
+      conn,
+      """
+      MATCH (u:User {id: $id})
+      DETACH DELETE u
+      """,
+      %{id: id}
+    )
+  end
+
   def get_potential_match(id) do
     conn = Bolt.Sips.conn()
 
