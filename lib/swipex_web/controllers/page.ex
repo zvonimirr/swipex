@@ -1,4 +1,5 @@
 defmodule SwipexWeb.PageController do
+  alias Phoenix.PubSub
   use SwipexWeb, :controller
 
   def index(conn, _params) do
@@ -22,6 +23,8 @@ defmodule SwipexWeb.PageController do
     with true <- String.length(name) > 0,
          true <- String.length(password) > 0,
          {:ok, _} <- Swipex.User.register(name, password) do
+      PubSub.broadcast(Swipex.PubSub, "swipex", {:new_user, name})
+
       conn
       |> put_flash(:info, "Registered successfully!")
       |> redirect(to: "/login")

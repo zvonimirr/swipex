@@ -34,4 +34,92 @@ defmodule Swipex.User do
       _ -> {:error, "User not found."}
     end
   end
+
+  def get_potential_match(id) do
+    conn = Bolt.Sips.conn()
+
+    with {:ok,
+          %Bolt.Sips.Response{
+            results: [
+              %{
+                "u" => %{properties: potential_match}
+              }
+            ]
+          }} <-
+           Bolt.Sips.query(
+             conn,
+             """
+             MATCH (u2:User {id: $id})
+             MATCH (u:User)
+             WHERE NOT (u2)-[:LIKES]->(u) AND NOT (u2)-[:DISLIKES]->(u)
+             AND u <> u2
+             RETURN u LIMIT 1
+             """,
+             %{id: id}
+           ),
+         {:ok, m} <- get_user_by_id(Map.get(potential_match, "id")) do
+      m
+    else
+      _ -> nil
+    end
+  end
+
+  def like(id, match_id) do
+    conn = Bolt.Sips.conn()
+
+    with {:ok, _} <-
+           Bolt.Sips.query(
+             conn,
+             """
+             MATCH (u1:User {id: $id})
+             MATCH (u2:User {id: $match_id})
+             CREATE (u1)-[:LIKES]->(u2)
+             """,
+             %{id: id, match_id: match_id}
+           ),
+         should_notify <- has_matched(id, match_id) do
+      {:ok, should_notify}
+    else
+      _ -> {:error, "Failed to like user."}
+    end
+  end
+
+  def dislike(id, match_id) do
+    conn = Bolt.Sips.conn()
+
+    with {:ok, _} <-
+           Bolt.Sips.query(
+             conn,
+             """
+             MATCH (u1:User {id: $id})
+             MATCH (u2:User {id: $match_id})
+             CREATE (u1)-[:DISLIKES]->(u2)
+             """,
+             %{id: id, match_id: match_id}
+           ) do
+      :ok
+    else
+      _ -> :error
+    end
+  end
+
+  def has_matched(id, match_id) do
+    conn = Bolt.Sips.conn()
+
+    with {:ok, %Bolt.Sips.Response{results: results}} <-
+           Bolt.Sips.query(
+             conn,
+             """
+             MATCH (u1:User {id: $id})
+             MATCH (u2:User {id: $match_id})
+             MATCH (u1)-[r:LIKES]->(u2)
+             RETURN u1, u2
+             """,
+             %{id: id, match_id: match_id}
+           ) do
+      results != []
+    else
+      _ -> false
+    end
+  end
 end
