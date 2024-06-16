@@ -3,11 +3,17 @@ defmodule Swipex.User do
     conn = Bolt.Sips.conn()
     id = UUID.uuid4()
 
-    Bolt.Sips.query(conn, "CREATE (u:User {id: $id, name: $name, password: $password})", %{
-      id: id,
-      name: name,
-      password: Bcrypt.hash_pwd_salt(password)
-    })
+    case get_user_by_name(name) do
+      {:ok, _} ->
+        {:error, "User already exists."}
+
+      _ ->
+        Bolt.Sips.query(conn, "CREATE (u:User {id: $id, name: $name, password: $password})", %{
+          id: id,
+          name: name,
+          password: Bcrypt.hash_pwd_salt(password)
+        })
+    end
   end
 
   def login(name, password) do
@@ -29,6 +35,17 @@ defmodule Swipex.User do
 
     with {:ok, %Bolt.Sips.Response{results: [%{"u" => %{properties: user}}]}} <-
            Bolt.Sips.query(conn, "MATCH (u:User {id: $id}) RETURN u", %{id: id}) do
+      {:ok, user}
+    else
+      _ -> {:error, "User not found."}
+    end
+  end
+
+  def get_user_by_name(name) do
+    conn = Bolt.Sips.conn()
+
+    with {:ok, %Bolt.Sips.Response{results: [%{"u" => %{properties: user}}]}} <-
+           Bolt.Sips.query(conn, "MATCH (u:User {name: $name}) RETURN u", %{name: name}) do
       {:ok, user}
     else
       _ -> {:error, "User not found."}

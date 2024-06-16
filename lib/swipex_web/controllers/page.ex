@@ -35,7 +35,7 @@ defmodule SwipexWeb.PageController do
 
   def do_register(conn, _params) do
     conn
-    |> put_flash(:error, "Invalid name or password.")
+    |> put_flash(:error, "Could not register. Please try again.")
     |> redirect(to: "/register")
   end
 
