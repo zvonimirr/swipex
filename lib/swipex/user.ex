@@ -6,7 +6,7 @@ defmodule Swipex.User do
     Bolt.Sips.query(conn, "CREATE (u:User {id: $id, name: $name, password: $password})", %{
       id: id,
       name: name,
-      password: password
+      password: Bcrypt.hash_pwd_salt(password)
     })
   end
 
@@ -14,10 +14,10 @@ defmodule Swipex.User do
     conn = Bolt.Sips.conn()
 
     with {:ok, %Bolt.Sips.Response{results: [%{"u" => %{properties: user}}]}} <-
-           Bolt.Sips.query(conn, "MATCH (u:User {name: $name, password: $password}) RETURN u", %{
-             name: name,
-             password: password
-           }) do
+           Bolt.Sips.query(conn, "MATCH (u:User {name: $name }) RETURN u", %{
+             name: name
+           }),
+         true <- Bcrypt.verify_pass(password, user["password"]) do
       {:ok, user}
     else
       _ -> {:error, "Invalid name or password."}
