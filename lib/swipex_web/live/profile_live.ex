@@ -104,7 +104,9 @@ defmodule SwipexWeb.ProfileLive do
         <% end %>
         <%= for match <- @matches do %>
           <div class="flex flex-col gap-3">
-            <p class="text-center"><%= match["name"] %></p>
+            <a href={"/chat/#{match["id"]}"} class="text-blue-400 hover:underline">
+              <%= match["name"] %>
+            </a>
           </div>
         <% end %>
       </div>
