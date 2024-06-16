@@ -103,6 +103,29 @@ defmodule Swipex.User do
     end
   end
 
+  def get_matches(id) do
+    conn = Bolt.Sips.conn()
+
+    with {:ok, %Bolt.Sips.Response{results: results}} <-
+           Bolt.Sips.query(
+             conn,
+             """
+             MATCH (u2:User {id: $id})
+             MATCH (u:User)
+             WHERE (u2)-[:LIKES]->(u) AND (u)-[:LIKES]->(u2)
+             AND u <> u2
+             RETURN u
+             """,
+             %{id: id}
+           ),
+         results <- Enum.map(results, &Map.get(&1, "u")),
+         matches <- Enum.map(results, &Map.get(&1, :properties)) do
+      matches
+    else
+      _ -> []
+    end
+  end
+
   def has_matched(id, match_id) do
     conn = Bolt.Sips.conn()
 

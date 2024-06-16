@@ -56,7 +56,7 @@ defmodule SwipexWeb.ProfileLive do
     assigns =
       assign(assigns, :potential_match, Swipex.User.get_potential_match(assigns.user["id"]))
 
-    assigns = assign(assigns, :matches, get_matches(assigns.user["id"]))
+    assigns = assign(assigns, :matches, Swipex.User.get_matches(assigns.user["id"]))
 
     ~H"""
     <div class="flex gap-4 justify-between w-full mb-3">
@@ -110,44 +110,5 @@ defmodule SwipexWeb.ProfileLive do
       </div>
     </div>
     """
-  end
-
-  defp get_matches(id) do
-    conn = Bolt.Sips.conn()
-
-    # Get all users that like the current user
-    Bolt.Sips.query!(
-      conn,
-      """
-      MATCH (u2:User {id: $id})
-      MATCH (u:User)
-      WHERE (u2)-[:LIKES]->(u) AND (u)-[:LIKES]->(u2)
-      AND u <> u2
-      RETURN u
-      """,
-      %{id: id}
-    )
-    |> Map.get(:results)
-    |> Enum.map(&Map.get(&1, "u"))
-    |> Enum.map(&get_user_from_response/1)
-  end
-
-  defp get_user_from_response(%Bolt.Sips.Types.Node{} = node) do
-    node
-    |> Map.get(:properties)
-    |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-  end
-
-  defp get_user_from_response(response) do
-    case response
-         |> Bolt.Sips.Response.first() do
-      nil ->
-        %{}
-
-      user ->
-        user
-        |> Map.get("u")
-        |> get_user_from_response()
-    end
   end
 end
