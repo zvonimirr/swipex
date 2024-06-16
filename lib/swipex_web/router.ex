@@ -23,6 +23,7 @@ defmodule SwipexWeb.Router do
     post "/register", PageController, :do_register
     get "/login", PageController, :login
     post "/login", PageController, :do_login
+    get "/logout", PageController, :logout
 
     live_session :default, on_mount: [{SwipexWeb.Profile, :current_user}] do
       live "/profile", ProfileLive, :index

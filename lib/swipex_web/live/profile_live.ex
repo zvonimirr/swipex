@@ -122,6 +122,8 @@ defmodule SwipexWeb.ProfileLive do
           </div>
         <% end %>
       </div>
+      <hr />
+      <a href="/logout" class="text-red-500">Logout</a>
     </div>
     """
   end

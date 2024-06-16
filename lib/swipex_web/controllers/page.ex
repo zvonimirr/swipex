@@ -64,4 +64,17 @@ defmodule SwipexWeb.PageController do
     |> put_flash(:error, "Invalid name or password.")
     |> redirect(to: "/login")
   end
+
+  def logout(conn, _params) do
+    case get_session(conn, :user_id) do
+      nil ->
+        redirect(conn, to: "/")
+
+      _ ->
+        conn
+        |> delete_session(:user_id)
+        |> put_flash(:info, "Logged out successfully!")
+        |> redirect(to: "/login")
+    end
+  end
 end
