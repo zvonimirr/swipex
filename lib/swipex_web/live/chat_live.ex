@@ -2,13 +2,15 @@ defmodule SwipexWeb.ChatLive do
   use SwipexWeb, :live_view
   alias Phoenix.PubSub
 
-  def mount(%{"id" => id}, %{"user_id" => _user_id}, socket) do
-    case Swipex.User.get_user_by_id(id) do
-      {:ok, user} ->
-        PubSub.subscribe(Swipex.PubSub, "swipex")
-        {:ok, assign(socket, :recipient, user)}
+  def mount(%{"id" => id}, %{"user_id" => user_id}, socket) do
+    IO.inspect({id, user_id})
 
-      {:error, _} ->
+    with true <- Swipex.User.has_matched(id, user_id),
+         {:ok, user} <- Swipex.User.get_user_by_id(id) do
+      PubSub.subscribe(Swipex.PubSub, "swipex")
+      {:ok, assign(socket, :recipient, user)}
+    else
+      _ ->
         {:ok, socket |> put_flash(:error, "Something went wrong.") |> redirect(to: "/profile")}
     end
   end
